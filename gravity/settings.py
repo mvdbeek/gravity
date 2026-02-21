@@ -21,10 +21,7 @@ from pydantic_settings import (
 )
 from typing_extensions import Annotated
 
-from gravity.util import (
-    StrEnum,
-    is_root,
-)
+from gravity.util import StrEnum
 
 DEFAULT_INSTANCE_NAME = "_default_"
 GX_IT_PROXY_MIN_VERSION = "0.0.6"
@@ -437,7 +434,7 @@ See https://docs.galaxyproject.org/en/latest/admin/scaling.html#dynamically-defi
     @classmethod
     def _process_manager_systemd_if_root(cls, value: Union[ProcessManager, None]) -> Union[ProcessManager, None]:
         if value is None:
-            if is_root():
+            if os.geteuid() == 0:
                 value = ProcessManager.systemd
         return value
 
@@ -445,7 +442,7 @@ See https://docs.galaxyproject.org/en/latest/admin/scaling.html#dynamically-defi
     @field_validator("galaxy_user", mode="after")
     @classmethod
     def _user_required_if_root(cls, value: Union[str, None], info: ValidationInfo) -> Union[str, None]:
-        if is_root():
+        if os.geteuid() == 0:
             is_systemd = info.data["process_manager"] == ProcessManager.systemd
             if is_systemd and not value:
                 raise ValueError("galaxy_user is required when running as root")
