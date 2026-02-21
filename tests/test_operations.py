@@ -39,7 +39,7 @@ def wait_for_startup(state_dir, free_port, prefix="/", path="/api/version", serv
                      process_manager_name="supervisor", start_time=None, instance_name=None):
     for _ in range(STARTUP_TIMEOUT * 5):
         try:
-            requests.get(f"http://localhost:{free_port}{prefix.rstrip('/')}{path}").raise_for_status()
+            requests.get(f"http://localhost:{free_port}{prefix.rstrip('/')}{path}", timeout=1).raise_for_status()
             return True, ""
         except Exception:
             time.sleep(0.25)
