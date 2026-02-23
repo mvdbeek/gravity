@@ -229,7 +229,6 @@ class SupervisorProcessManager(BaseProcessManager):
     def _disable_and_remove_pm_files(self, pm_files: Iterable[str]) -> None:
         # don't need to stop anything - `supervisorctl update` afterward will take care of it
         if pm_files:
-            self._service_changes = True
             gravity.io.info(f"Removing supervisor configs: {', '.join(pm_files)}")
             list(map(os.unlink, pm_files))
         for instance_dir in set(os.path.dirname(f) for f in pm_files):
@@ -439,10 +438,7 @@ class SupervisorProcessManager(BaseProcessManager):
             self.__process_configs(configs, force)
         # only need to update if supervisord is running, otherwise changes will be picked up at next start
         if self.__supervisord_is_running():
-            if self._service_changes:
-                self.supervisorctl("update")
-            else:
-                gravity.io.debug("No service changes, supervisorctl update not performed")
+            self.supervisorctl("update")
 
     def supervisorctl(self, *args):
         if not self.__supervisord_is_running():
