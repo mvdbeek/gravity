@@ -229,6 +229,7 @@ class SupervisorProcessManager(BaseProcessManager):
     def _disable_and_remove_pm_files(self, pm_files: Iterable[str]) -> None:
         # don't need to stop anything - `supervisorctl update` afterward will take care of it
         if pm_files:
+            self._service_changes = True
             gravity.io.info(f"Removing supervisor configs: {', '.join(pm_files)}")
             list(map(os.unlink, pm_files))
         for instance_dir in set(os.path.dirname(f) for f in pm_files):
@@ -346,12 +347,19 @@ class SupervisorProcessManager(BaseProcessManager):
             for service in services:
                 program = self.__supervisor_programs(config, [service.service_name])[0]
                 graceful_method = service.graceful_method
+                gravity.io.debug(
+                    "Graceful: service=%s type=%s graceful_method=%s program_names=%s",
+                    service.service_name, type(service).__name__, graceful_method, program.program_names)
                 if graceful_method == GracefulMethod.SIGHUP:
+                    gravity.io.info(f"Sending SIGHUP to {', '.join(program.program_names)}")
                     self.supervisorctl("signal", "SIGHUP", *program.program_names)
                 elif graceful_method == GracefulMethod.ROLLING:
                     self.__rolling_restart(config, service, program)
                 elif graceful_method != GracefulMethod.NONE:
+                    gravity.io.info(f"Restarting {', '.join(program.program_names)}")
                     self.supervisorctl("restart", *program.program_names)
+                else:
+                    gravity.io.debug("Skipping %s (graceful method is NONE)", service.service_name)
 
     def __rolling_restart(self, config, service, program):
         restart_callbacks = list(partial(self.supervisorctl, "restart", p) for p in program.program_names)
@@ -431,7 +439,10 @@ class SupervisorProcessManager(BaseProcessManager):
             self.__process_configs(configs, force)
         # only need to update if supervisord is running, otherwise changes will be picked up at next start
         if self.__supervisord_is_running():
-            self.supervisorctl("update")
+            if self._service_changes:
+                self.supervisorctl("update")
+            else:
+                gravity.io.debug("No service changes, supervisorctl update not performed")
 
     def supervisorctl(self, *args):
         if not self.__supervisord_is_running():

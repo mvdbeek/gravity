@@ -198,8 +198,11 @@ def test_cmd_graceful(state_dir, galaxy_yml, tusd_startup_config, free_port, pro
     start_instance(state_dir, galaxy_yml, free_port, process_manager_name, instance_name=instance_name)
     before_pids = service_pid_func(runner, galaxy_yml, instance_name)
     result = runner.invoke(galaxyctl, ['--config-file', str(galaxy_yml), 'graceful'])
-    assert result.exit_code == 0, result.output
+    assert result.exit_code == 0, f"graceful failed: {result.output}"
+    print(f"DEBUG graceful output:\n{result.output}")
     after_pids = service_pid_func(runner, galaxy_yml, instance_name)
+    print(f"DEBUG before_pids: {before_pids}")
+    print(f"DEBUG after_pids: {after_pids}")
     assert before_pids['gunicorn'] == after_pids['gunicorn'], f"{before_pids}; {after_pids}"
     assert before_pids['celery'] != after_pids['celery'], f"{before_pids}; {after_pids}"
     assert before_pids['celery-beat'] != after_pids['celery-beat'], f"{before_pids}; {after_pids}"
