@@ -1,3 +1,56 @@
+[build-system]
+requires = ["setuptools>=77.0.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "gravity"
+dynamic = ["version", "readme"]
+description = "Command-line utilities to assist in managing Galaxy servers"
+license = "MIT"
+license-files = [
+    "LICENSE",
+]
+keywords = ["gravity", "galaxy"]
+authors = [
+    {name = "The Galaxy Team", email = "team@galaxyproject.org"},
+]
+requires-python = ">=3.8"
+dependencies = [
+    "Click",
+    "supervisor",
+    "pyyaml",
+    "packaging",
+    "pydantic>=2,<3",
+    "pydantic-settings",
+    "jsonref",
+    "requests",
+    "requests-unixsocket",
+]
+classifiers = [
+    "Intended Audience :: System Administrators",
+    "Natural Language :: English",
+    "Operating System :: POSIX",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+]
+
+[project.urls]
+Homepage = "https://github.com/galaxyproject/gravity"
+
+[project.scripts]
+galaxy = "gravity.cli:galaxy"
+galaxyctl = "gravity.cli:galaxyctl"
+
+[tool.setuptools.dynamic]
+version = {attr = "gravity.__version__"}
+readme = {file = ["README.rst", "HISTORY.rst"], content-type = "text/x-rst"}
+
 [tool.black]
 line-length = 160
 
