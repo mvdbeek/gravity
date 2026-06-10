@@ -12,7 +12,7 @@ from yaml import safe_load
 from gravity.cli import galaxyctl
 from gravity.state import CELERY_BEAT_DB_FILENAME
 
-STARTUP_TIMEOUT = 30
+STARTUP_TIMEOUT = 90
 CELERY_BEAT_TIMEOUT = 10
 # celery.beat.PersistentScheduler uses shelve, which can append a suffix based on which db backend is used
 CELERY_BEAT_DB_FILENAMES = list(map(lambda ext: CELERY_BEAT_DB_FILENAME + ext, ('', '.db', '.dat', '.bak', '.dir')))
