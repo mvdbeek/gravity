@@ -2,6 +2,14 @@
  History
 =========
 
+1.2.3
+=====
+
+- Fix path to version file for graceful under Galaxy 26.1 by @natefoo in https://github.com/galaxyproject/gravity/pull/156
+- Increase STARTUP_TIMEOUT to 90 for Galaxy dev startup by @natefoo in https://github.com/galaxyproject/gravity/pull/156
+- Use default celery beat schedule filename by @nsoranzo in https://github.com/galaxyproject/gravity/pull/150
+- Migrate from ``setup.py`` to ``pyproject.toml`` by @nsoranzo in https://github.com/galaxyproject/gravity/pull/155
+
 1.2.2
 =====
 
